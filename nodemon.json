@@ -1,0 +1,11 @@
+{
+    "verbose": true,
+    "watch": [
+        "dist/server.js",
+        ".env"
+    ],
+    "ext": "js",
+    "execMap": {
+        "js": "node dist/server.js"
+      }
+}

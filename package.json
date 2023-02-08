@@ -1,0 +1,44 @@
+{
+  "name": "sockets",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^2.0.2",
+    "@tsconfig/svelte": "^3.0.0",
+    "@types/node": "^18.11.18",
+    "@types/qs": "^6.9.7",
+    "comment-json": "^4.2.3",
+    "esbuild": "^0.17.5",
+    "mongoose": "^6.9.0",
+    "nodemon": "^2.0.20",
+    "svelte": "^3.55.1",
+    "svelte-check": "^3.0.3",
+    "ts-node": "^10.9.1",
+    "tslib": "^2.5.0",
+    "typescript": "^4.9.5",
+    "vite": "^4.0.4"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.266.0",
+    "@sinclair/typebox": "^0.25.21",
+    "argon2": "^0.30.3",
+    "dotenv": "^16.0.3",
+    "mongodb": "^4.13.0",
+    "nanoid": "^4.0.0",
+    "qs": "^6.11.0",
+    "sweetalert2": "^11.7.1",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.19.0",
+    "winston": "^3.8.2"
+  }
+}
