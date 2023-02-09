@@ -26,7 +26,7 @@ export enum Code {
     /**
      *! unprocessable Entity!
      */
-    unprocessable = '422',
+    unProcessable = '422',
     /**
      *! internal server error!
      */

@@ -11,4 +11,4 @@ const signUpSchema = Type.Object({
 })
 
 export const signUpRule = compile(signUpSchema);
-export type ISignUpSchema = Parameters<typeof signUpRule>[0]
+export type ISignUpSchema =  Static<typeof signUpSchema>

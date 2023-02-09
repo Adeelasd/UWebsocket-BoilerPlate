@@ -1,13 +1,30 @@
-import { req } from "../lib/request";
+import { form } from "../lib/json";
+import { getHeaders, req } from "../lib/request";
 import { signUpRule } from "../schema/userSchema";
+import body from "busboy"
 
 export const hello = req(async ({ msg, getQs, req, error, res }) => {
-    msg("Hello")
+    msg("Hello World!")
+})
+
+
+
+
+export const SignUp = req(async ({ send, msg, getQs, req, error, res, getJson }) => {
+    send(await getJson())
 }, signUpRule)
 
 
 
+export const uploadFile = req(async ({ send, msg, getQs, req, error, res, getJson }) => {
+    // msg("Test")
+    // console.log(Object.fromEntries(getHeaders(req)))
+    // body({ headers: Object.fromEntries(getHeaders(req)) }).on("file", (name,stream,info) => {
+    //     console.log(name)
+    // })
 
-export const SignUp = req(async ({ msg, getQs, req, error, res,getJson }) => {
+    await form(res, req)
 
-}, signUpRule)
+    // console.log("GG")
+
+})

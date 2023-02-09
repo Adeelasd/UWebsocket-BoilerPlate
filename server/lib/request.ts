@@ -1,7 +1,9 @@
+import { TSchema, Static } from "@sinclair/typebox"
+import { TypeCheck } from "@sinclair/typebox/compiler"
+import { ValueError } from "@sinclair/typebox/errors"
 import { HttpRequest, HttpResponse } from "uWebSockets.js"
 import { Code } from "../../global/statusCodes"
 import { IReq } from "../../types/Global"
-import { signUpRule } from "../schema/userSchema"
 import { parseQs, readJsonAsync } from "./json"
 
 type ISuccess = (data: any, msg?: string, statusCode?: Code) => any
@@ -34,7 +36,7 @@ const msgRes = (msg: string) => `
 }
 `
 
-export const req = <T = any>(fn: IHandler<T>, validator?: (data: T) => boolean) => {
+export const req = <T extends TSchema = any>(fn: IHandler<Static<T>>, validator?: TypeCheck<T>) => {
 
     return (async (res, req) => {
         res.onAborted(() => headerSent())
@@ -42,10 +44,10 @@ export const req = <T = any>(fn: IHandler<T>, validator?: (data: T) => boolean) 
         const headerSent = () => res.headerSent = true
         const sendable = () => !res.headerSent
 
-        const error: IError = (error, statusCode = Code.unprocessable, data = {}) => {
+        const error: IError = (error, statusCode = Code.unProcessable, data = {}) => {
             try {
                 if (sendable()) {
-                    res.writeStatus(statusCode).end(msgRes(error.message ?? error))
+                    res.writeStatus(statusCode).end(error.message ? msgRes(error.message) : writeRes(error))
                     headerSent()
                 }
 
@@ -82,7 +84,17 @@ export const req = <T = any>(fn: IHandler<T>, validator?: (data: T) => boolean) 
 
             }
 
-            const getJson = async <T>() => readJsonAsync(res) as T
+            const getJson = async <T>() => {
+                const parse = await readJsonAsync(res) as T
+                if (validator) {
+                    let errors = [...validator.Errors(parse as any)]
+                    console.log(error)
+                    if (error.length)
+                        throw error(errors, Code.unProcessable)
+
+                }
+                return parse
+            }
 
             const getQs = <T>(extended?: boolean) => {
                 return parseQs(req, extended) as T
@@ -110,7 +122,7 @@ const writeRes = (data: any) => {
     }
 }
 
-const getHeaders = (req: HttpRequest) => {
+export const getHeaders = (req: HttpRequest) => {
     const ctx = new Map()
     req.forEach((key, val) => {
         ctx.set(key, val)
