@@ -5,5 +5,4 @@ http.get('/', hello)
 http.post('/signup', SignUp)
 http.post('/upload',uploadFile)
 
-
 export { http }

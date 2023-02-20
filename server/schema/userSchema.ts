@@ -1,6 +1,5 @@
 import { Static, Type ,} from "@sinclair/typebox";
 import { TypeCompiler,TypeCheck } from "@sinclair/typebox/compiler";
-import { compile } from "../lib/validator";
 import "../validations/format"
 
 const signUpSchema = Type.Object({
@@ -10,5 +9,5 @@ const signUpSchema = Type.Object({
     remember:Type.String()
 })
 
-export const signUpRule = compile(signUpSchema);
+export const signUpRule = TypeCompiler.Compile(signUpSchema);
 export type ISignUpSchema =  Static<typeof signUpSchema>

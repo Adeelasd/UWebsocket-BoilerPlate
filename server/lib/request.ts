@@ -1,10 +1,9 @@
 import { TSchema, Static } from "@sinclair/typebox"
 import { TypeCheck } from "@sinclair/typebox/compiler"
-import { ValueError } from "@sinclair/typebox/errors"
 import { HttpRequest, HttpResponse } from "uWebSockets.js"
 import { Code } from "../../global/statusCodes"
 import { IReq } from "../../types/Global"
-import { parseQs, readJsonAsync } from "./json"
+import { parseQs, readJsonAsync } from "./dataParser"
 
 type ISuccess = (data: any, msg?: string, statusCode?: Code) => any
 type IMessage = (msg: string, statusCode?: Code) => any
@@ -83,21 +82,22 @@ export const req = <T extends TSchema = any>(fn: IHandler<Static<T>>, validator?
                 }
 
             }
-
-            const getJson = async <T>() => {
-                const parse = await readJsonAsync(res) as T
+            const validate = <T>(data) => {
                 if (validator) {
-                    let errors = [...validator.Errors(parse as any)]
+                    let errors = [...validator.Errors(data as any)]
                     console.log(error)
                     if (error.length)
                         throw error(errors, Code.unProcessable)
-
                 }
-                return parse
+                return data as T
+            }
+
+            const getJson = async <T>() => {
+                return validate<T>(await readJsonAsync(res))
             }
 
             const getQs = <T>(extended?: boolean) => {
-                return parseQs(req, extended) as T
+                return validate<T>(parseQs(req, extended))
             }
 
             const data = await fn({ send, error, msg, req, res, getQs, getJson })

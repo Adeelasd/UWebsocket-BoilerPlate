@@ -6,7 +6,8 @@ export interface IFormData {
         [key: string]: {
             path?: string,
             type?: string,
-            name?: string
+            name?: string,
+            originalName?: string
         }
     }
 }

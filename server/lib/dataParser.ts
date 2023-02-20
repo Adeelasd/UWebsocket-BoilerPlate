@@ -1,18 +1,13 @@
-import uWeb, { getParts, HttpRequest } from "uWebSockets.js"
+import uWeb, { HttpRequest } from "uWebSockets.js"
 import nodeqs from "node:querystring"
-import readline from "readline"
-import { Readable } from "stream"
 import qs from "qs"
 import path from "node:path"
 import { __dirname } from "../config/config"
-import { createWriteStream, mkdirSync, WriteStream } from "fs"
 import { nanoid } from "nanoid"
 import { IFormData } from "../../types/Upload"
-import { parse } from "parse-multipart-data"
-import os from "os"
 import busyboy from "busboy"
 import { getHeaders } from "./request"
-import { appendFile, appendFileSync, writeFile } from "node:fs"
+import { appendFileSync } from "node:fs"
 export const readJson = (res: uWeb.HttpResponse, cb: (json: any) => any, err: () => any) => {
     let buffer: Uint8Array | Buffer;
     /* Register data cb */
@@ -97,18 +92,18 @@ export const readJsonAsync = <T = any>(res: uWeb.HttpResponse) => {
     // res.onAborted(err);
 }
 
-const getKey = (e: string, name: string) => {
-    const keyExists = e.indexOf(name)
-    if (keyExists == -1) return ""
-    const extendsName = e.indexOf(';', keyExists)
-    let val = e.slice(e.indexOf('"', keyExists), extendsName == -1 ? undefined : extendsName)
+// const getKey = (e: string, name: string) => {
+//     const keyExists = e.indexOf(name)
+//     if (keyExists == -1) return ""
+//     const extendsName = e.indexOf(';', keyExists)
+//     let val = e.slice(e.indexOf('"', keyExists), extendsName == -1 ? undefined : extendsName)
 
-    try {
-        return JSON.parse(val)
-    } catch (error) {
-        return val
-    }
-}
+//     try {
+//         return JSON.parse(val)
+//     } catch (error) {
+//         return val
+//     }
+// }
 
 export const form = (res: uWeb.HttpResponse, req: HttpRequest) => {
 
@@ -130,10 +125,14 @@ export const form = (res: uWeb.HttpResponse, req: HttpRequest) => {
                     appendFileSync(filePath, e)
                 })
                 data.files[name] = {}
-                data.files[name].name = info.filename
+                data.files[name].originalName = info.filename
                 data.files[name].path = filePath
-            }).on("field", (name, value) => {
+                data.files[name].name = newFileName
+                data.files[name].type = info.mimeType
 
+
+            }).on("field", (name, value) => {
+                data.data[name] = value
             })
             res.onData((ab, isLast) => {
                 const chunk = Buffer.from(ab);
@@ -145,6 +144,10 @@ export const form = (res: uWeb.HttpResponse, req: HttpRequest) => {
                     })
                 }
             });
+
+            boy.on("error", (error) => {
+                reject(error)
+            })
         } catch (error) {
             reject(error)
         }
@@ -155,17 +158,6 @@ export const form = (res: uWeb.HttpResponse, req: HttpRequest) => {
     /* Register error cb */
     // res.onAborted(err);
 }
-/**
- * 
- * @param name 
- * @param data 
- * disk for local storage
- */
-
-const disk = (name: string, data: string) => {
-    let uploadDir = path.join(__dirname, '/uploads')
-}
-
 
 export const parseQs = (req: HttpRequest, extended?: boolean) => {
     const data = req.getQuery();
